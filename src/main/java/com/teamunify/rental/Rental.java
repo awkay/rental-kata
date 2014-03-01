@@ -6,6 +6,7 @@ import org.joda.time.DateTimeComparator;
 import com.teamunify.time.Times;
 
 public class Rental {
+  private final Long id = Identities.rentalIDFactory.make();
   private final Calendar dueDate;
   private final int gracePeriodInDays;
 
@@ -37,5 +38,9 @@ public class Rental {
   public boolean isPastDue() {
     DateTimeComparator comparator = DateTimeComparator.getDateOnlyInstance();
     return comparator.compare(Times.now.make(), getHardDueDate()) > 0;
+  }
+
+  public long getId() {
+    return id;
   }
 }

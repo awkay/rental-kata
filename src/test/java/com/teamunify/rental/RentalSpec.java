@@ -1,9 +1,12 @@
 package com.teamunify.rental;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import org.joda.time.DateTimeComparator;
+import org.junit.Before;
 import org.junit.Test;
 import com.teamunify.time.Times;
 import com.teamunify.util.Function0;
@@ -12,6 +15,11 @@ public class RentalSpec {
 
   private static final int fourDays = 4;
   private static final int twoDays = 2;
+  
+  @Before
+  public void setup() {
+    Identities.rentalIDFactory.resetToDefault();
+  }
 
   @Test
   public void rentals_have_a_due_date_and_grace_period() {
@@ -20,6 +28,26 @@ public class RentalSpec {
 
     assertEquals(expectedDueDate, rental.getDueDate());
     assertEquals(fourDays, rental.getGracePeriod());
+  }
+
+  @Test
+  public void rentals_get_their_identity_from_a_GlobalIDFunction() {
+    Identities.rentalIDFactory.set(Function0.functionReturningValue(3L));
+    
+    Rental rental = new Rental(january(3, 2001), 4);
+    
+    assertEquals(3L, rental.getId());
+  }
+  
+  @Test
+  public void id_does_not_change_once_obtained_so_that_getId_is_idempotent() {
+    Identities.rentalIDFactory.set(Function0.functionReturningValue(3L));
+    
+    Rental rental = new Rental(january(3, 2001), 4);
+    
+    assertEquals(3L, rental.getId());
+    Identities.rentalIDFactory.set(Function0.functionReturningValue(4L));
+    assertEquals(3L, rental.getId());
   }
 
   @Test
